@@ -1,6 +1,6 @@
 from __future__ import annotations
 from composio_langgraph import Action, ComposioToolSet, App
-from composio_tools_agent import Composio_agent
+
 
 from pydantic_graph import BaseNode, End, GraphRunContext, Graph
 from pydantic_ai import Agent
@@ -8,9 +8,11 @@ from datetime import datetime
 
 from pydantic import BaseModel,Field
 from dataclasses import dataclass
-
+from pydantic_ai.models.google import GoogleModel
+from pydantic_ai.providers.google import GoogleProvider
+from langchain_openai import ChatOpenAI
 from typing import Annotated, List, Optional
-
+from composio_tools_agent import Composio_agent
 #get graph visuals
 from IPython.display import Image, display
 import os
@@ -41,14 +43,17 @@ class State:
     #mail inbox is the inbox of the user
     mail_inbox:dict
 class outlook_agent:
-    def __init__(self,llms: dict, toolset:ComposioToolSet):
+    def __init__(self,api_keys:dict):
         """
         Args:
             llm (any): The language model to use using langchain_framework
             toolset (ComposioToolSet): The toolset to use
         """
+        llms={'pydantic_llm':GoogleModel('gemini-2.5-flash-preview-05-20', provider=GoogleProvider(api_key=api_keys['google_api_key'])),
+              
+              'openai_llm':ChatOpenAI(model='gpt-4.1-nano',api_key=api_keys['openai_api_key'])}   
         # tools is the composio toolset
-        self.tools=toolset
+        self.tools=ComposioToolSet(api_key=api_keys['composio_key'])
         # tool_shemas is a dictionary of the tool names and the actions they can perform
         self.tool_shemas={
             'Outlook Manager':{tool.name:tool for tool in self.tools.get_action_schemas(apps=[App.OUTLOOK])},
