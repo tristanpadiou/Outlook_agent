@@ -1,5 +1,5 @@
 from __future__ import annotations
-from composio_langgraph import Action, ComposioToolSet, App
+from composio_langgraph import ComposioToolSet, App
 
 
 from pydantic_graph import BaseNode, End, GraphRunContext, Graph
@@ -11,7 +11,7 @@ from dataclasses import dataclass
 from pydantic_ai.models.google import GoogleModel
 from pydantic_ai.providers.google import GoogleProvider
 from langchain_openai import ChatOpenAI
-from typing import Annotated, List, Optional
+from typing import List
 from composio_tools_agent import Composio_agent
 #get graph visuals
 from IPython.display import Image, display

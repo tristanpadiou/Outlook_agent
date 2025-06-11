@@ -1,0 +1,42 @@
+# Ignore git files
+.git
+.gitignore
+
+# Ignore Python cache and virtual environment
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+.Python
+.venv
+venv/
+env/
+
+# Ignore Jupyter notebook files
+*.ipynb
+.ipynb_checkpoints
+
+# Ignore IDE and editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Ignore OS files
+.DS_Store
+Thumbs.db
+
+# Ignore log files
+*.log
+.logfire/
+
+# Ignore test files and documentation
+README.md
+docs/
+
+# Ignore audio samples (can be large)
+audio_samples/
+
+# Ignore token files (security)
+token.json
+.env 
