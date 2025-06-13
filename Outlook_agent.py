@@ -199,7 +199,7 @@ class outlook_agent:
             outlook_agent=self.outlook_agent
             async def run(self,ctx: GraphRunContext[State])->eval_node:
                 
-                response=self.outlook_agent.chat(ctx.state.plan.task + f'if the query is about sending an email, do not send any attachements, just send the url in the body, if there is an error, explain it in detail'+ f'query_notes:{ctx.state.query_notes if ctx.state.query_notes else "no query notes"}')
+                response=self.outlook_agent.chat(f'action:{ctx.state.plan.action}, task:{ctx.state.plan.task} if the query is about sending an email, do not send any attachements, just send the url in the body, if there is an error, explain it in detail'+ f'query_notes:{ctx.state.query_notes if ctx.state.query_notes else "no query notes"}')
                 #save the inbox in the state for future use
                 if ctx.state.plan.action=='OUTLOOK_LIST_MESSAGES':
                     inbox=[]
