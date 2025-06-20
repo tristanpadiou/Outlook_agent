@@ -3,7 +3,7 @@ from composio_langgraph import ComposioToolSet, App
 
 
 from pydantic_graph import BaseNode, End, GraphRunContext, Graph
-from pydantic_ai import Agent
+from pydantic_ai import Agent, format_as_xml
 from datetime import datetime
 
 from pydantic import BaseModel,Field
@@ -105,13 +105,13 @@ class outlook_agent:
                     action: str = Field(description='the action that the manager tool must take,if all the tasks are completed return End')
                     task: str = Field(description='the task that the manager tool must complete, if all the tasks are completed return End')
                     
-                if len(ctx.state.node_messages_list)>9:
+                if len(ctx.state.node_messages_list)>5:
                     del ctx.state.node_messages_list[0]
                 #generate the plan
-                plan_agent=Agent(self.llm,output_type=plan_shema, instructions=f'based on a query, and the previous node messages (if any) and the previous plan (if any), generate or modify a plan using those manager tools: {self.tool_functions} to get the necessary info and to complete the query, use the planning notes to improve the planning, if any, the plan cannot contain more than 10 tasks, if a manager returns a auth error return End')
+                plan_agent=Agent(self.llm,output_type=plan_shema, instructions=f'based on a query, and the previous node messages (if any) and the previous plan (if any), generate or modify a plan using those manager tools: {format_as_xml(self.tool_functions)} to get the necessary info and to complete the query, use the planning notes to improve the planning, if any, the plan cannot contain more than 10 tasks, if a manager returns a auth error return End')
                 try:
                     if ctx.state.n_retries<3:
-                        response=plan_agent.run_sync(f'query:{ctx.state.query},eval_messages:{ctx.state.eval_messages_dict}, planning_notes:{ctx.state.planning_notes}, previous_node_messages:{ctx.state.node_messages_list}, previous_plan:{ctx.state.plan if ctx.state.plan else "no previous plan"}') 
+                        response=plan_agent.run_sync(f'query:{ctx.state.query},eval_messages:{ctx.state.eval_messages_dict}, planning_notes:{ctx.state.planning_notes}, previous_node_messages:{ctx.state.node_messages_list}, previous_plan:{format_as_xml(ctx.state.plan) if ctx.state.plan else "no previous plan"}') 
                         ctx.state.plan=response.output
                         ctx.state.node_messages_dict['agent_node']=response.output
                         return router_node()
@@ -159,7 +159,7 @@ class outlook_agent:
                 class planning_improve_shema(BaseModel):
                     planning_improvement: str = Field(description='the planning improvement notes')
                 agent=Agent(self.llm,output_type=planning_improve_shema, instructions=f'based on the dict of tools and the prompt, and the previous planning notes (if any), create a notes to improve the planning or use of a tool for the planner node')
-                response=agent.run_sync(f'prompt:{ctx.state.query}, tool_functions:{self.tool_functions}, previous_planning_notes:{ctx.state.planning_notes if ctx.state.planning_notes else "no previous planning notes"}')
+                response=agent.run_sync(f'prompt:{ctx.state.query}, tool_functions:{format_as_xml(self.tool_functions)}, previous_planning_notes:{ctx.state.planning_notes if ctx.state.planning_notes else "no previous planning notes"}')
                 ctx.state.planning_notes=response.output.planning_improvement
                 if ctx.state.node_messages_dict.get(ctx.state.plan.manager_tool):
                     ctx.state.node_messages_dict[ctx.state.plan.manager_tool][ctx.state.plan.action]=response.output.planning_improvement
@@ -179,7 +179,7 @@ class outlook_agent:
                     action: str = Field(description='the action that the manager tool must take')
 
                 agent=Agent(self.llm,output_type=query_notes_shema, instructions=f'based on the user query, and the tools, edit the query notes to help the agent to fulfill the requirements of the user')
-                response=agent.run_sync(f'prompt:{ctx.state.query}, tool_functions:{self.tool_functions}')
+                response=agent.run_sync(f'prompt:{ctx.state.query}, tool_functions:{format_as_xml(self.tool_functions)}')
                 if ctx.state.query_notes.get(response.output.manager_tool):
                     ctx.state.query_notes[response.output.manager_tool][response.output.action]={'query_notes':response.output.query_notes}
                 else:
