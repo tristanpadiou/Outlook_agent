@@ -12,7 +12,7 @@ from pydantic_ai.models.google import GoogleModel
 from pydantic_ai.providers.google import GoogleProvider
 from langchain_openai import ChatOpenAI
 from typing import List
-from composio_tools_agent import Composio_agent
+from utils.composio_tools_agent import Composio_agent
 #get graph visuals
 from IPython.display import Image, display
 import os
