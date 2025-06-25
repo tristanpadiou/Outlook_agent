@@ -46,7 +46,7 @@ class outlook_agent:
     def __init__(self,api_keys:dict):
         """
         Args:
-            llm (any): The language model to use using langchain_framework
+            
             toolset (ComposioToolSet): The toolset to use
         """
         llms={'pydantic_llm':GoogleModel('gemini-2.5-flash-preview-05-20', provider=GoogleProvider(api_key=api_keys['google_api_key'])),
@@ -148,6 +148,8 @@ class outlook_agent:
                 else:
                     ctx.state.plan={}
                     ctx.state.eval_messages_dict={}
+                    if not ctx.state.node_messages_list:
+                        ctx.state.node_messages_list.append({'error':ctx.state.plan})
                     return End(ctx.state)
                     
                 
